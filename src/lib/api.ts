@@ -95,6 +95,33 @@ const redirectToLogin = () => {
   window.location.assign(`/masuk?redirect=${redirect}`);
 };
 
+// Pembungkus fetch dengan interceptor 401 dan satu promise refresh bersama,
+// digunakan untuk endpoint yang mengembalikan berkas (mis. GET /export).
+export const apiFetch = async (path: string, init: RequestInit = {}): Promise<Response> => {
+  const normalizedBase = baseURL.replace(/\/$/, "");
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const url = `${normalizedBase}${normalizedPath}`;
+  const requestInit: RequestInit = {
+    ...init,
+    credentials: "include",
+  };
+
+  const response = await fetch(url, requestInit);
+  const isAuthPath = /\/auth\/(login|register|refresh|logout)/.test(normalizedPath);
+
+  if (response.status === 401 && !isAuthPath) {
+    try {
+      await refreshSession();
+      return await fetch(url, requestInit);
+    } catch {
+      redirectToLogin();
+      return response;
+    }
+  }
+
+  return response;
+};
+
 api.interceptors.response.use(
   (response) => {
     const payload = response.data as Record<string, unknown>;

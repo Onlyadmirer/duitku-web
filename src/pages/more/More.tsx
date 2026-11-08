@@ -27,6 +27,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { ExportSection } from "@/features/export/ExportSection";
 import {
   useCategories,
   useLogout,
@@ -140,6 +141,8 @@ function MorePage() {
           </div>
         </div>
       </section>
+
+      <ExportSection />
 
       <section className='flex flex-col gap-2'>
         <h2 className='px-1 text-[11px] font-bold tracking-wide text-muted-foreground uppercase'>
